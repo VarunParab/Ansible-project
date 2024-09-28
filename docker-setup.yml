@@ -1,0 +1,43 @@
+---
+- hosts: local
+  tasks:
+    - name: Install Docker SDK for Python (if not already installed)
+      pip:
+        name: docker
+        state: present
+      become: yes
+
+    - name: Pull the Ubuntu Docker image
+      community.docker.docker_image:
+        name: ubuntu
+        tag: latest
+        source: pull
+
+    - name: Create and start Docker containers
+      community.docker.docker_container:
+        name: "my_container_{{ item }}"
+        image: ubuntu
+        state: started
+        command: "sleep infinity"
+        published_ports:
+          - "808{{ item }}:80"  # Maps ports 8080 and 8081
+      loop:
+        - 1
+        - 2
+
+    - name: Install Apache inside the Docker containers
+      community.docker.docker_container_exec:
+        container: "my_container_{{ item }}"
+        command: /bin/bash -c "apt-get update && apt-get install -y apache2"
+      loop:
+        - 1
+        - 2
+
+    - name: Start Apache service inside the containers
+      community.docker.docker_container_exec:
+        container: "my_container_{{ item }}"
+        command: service apache2 start
+      loop:
+        - 1
+        - 2
+
