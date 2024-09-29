@@ -1,4 +1,4 @@
-# Ansible project to create and manage docker containers(acting as VMs)
+# Ansible project 
 Steps to reproduce-
 - Create a conda env
 - run command "ansible-galaxy collection install community.docker"
